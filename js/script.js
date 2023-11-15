@@ -288,6 +288,8 @@ function buscar(input) {
     }
 
 
+  }else{
+    cargarLibros(localStorage.getItem("librosData"),localStorage.getItem("imagenesData"));
   }
 
 
