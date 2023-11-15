@@ -131,7 +131,7 @@
 
 var parser = new DOMParser();
 
-export default async function fetchData() {
+export async function fetchData() {
 
   let librosData = localStorage.getItem("librosData");
   let imagenesData = localStorage.getItem("imagenesData");
