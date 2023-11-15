@@ -173,29 +173,32 @@ export async function fetchData() {
 }
 
 function listaXML() {
-  if (localStorage.getItem("listaXML")== null) {
-      let librosData = localStorage.getItem("librosData");
-      let imagenesData = localStorage.getItem("imagenesData");
-      const xml = parser.parseFromString(librosData, 'application/xml');
-      let books = xml.querySelectorAll('book');
-      let lista = [];
+  if (localStorage.getItem("listaXML") == null) {
+    let librosData = localStorage.getItem("librosData");
+    let imagenesData = localStorage.getItem("imagenesData");
+    imagenesData = JSON.parse(imagenesData);
+    const xml = parser.parseFromString(librosData, 'application/xml');
+    let books = xml.querySelectorAll('book');
+    let lista = [];
 
 
-      for (let i = 0; i < books.length; i++) {
-        let book = books[i]
-        let codigo = book.querySelector('ISBN') ? book.querySelector('ISBN').textContent : 'fasd'
-        let añoPublicacion = book.querySelector('Year-Of-Publication') ? book.querySelector('Year-Of-Publication').textContent : 'fasd'
-        let autorLibro = book.querySelector('Book-Author') ? book.querySelector('Book-Author').textContent : 'dsaf'
-        let nombreLibro = book.querySelector('Book-Title') ? book.querySelector('Book-Title').textContent : 'afds'
+    for (let i = 0; i < books.length; i++) {
+      let book = books[i]
+      let codigo = book.querySelector('ISBN') ? book.querySelector('ISBN').textContent : 'fasd'
+      let añoPublicacion = book.querySelector('Year-Of-Publication') ? book.querySelector('Year-Of-Publication').textContent : 'fasd'
+      let autorLibro = book.querySelector('Book-Author') ? book.querySelector('Book-Author').textContent : 'dsaf'
+      let nombreLibro = book.querySelector('Book-Title') ? book.querySelector('Book-Title').textContent : 'afds'
+      let imagenURL = imagenesData[i]["Image-URL-M"];
 
-        lista.push({
-          "codigo": codigo,
-          "añoPublicacion": añoPublicacion,
-          "autorLibro": autorLibro,
-          "nombreLibro": nombreLibro
-        })
-      }
-      localStorage.setItem("listaXML",JSON.stringify(lista));
+      lista.push({
+        "codigo": codigo,
+        "añoPublicacion": añoPublicacion,
+        "autorLibro": autorLibro,
+        "nombreLibro": nombreLibro,
+        "imagenURL": imagenURL
+      })
+    }
+    localStorage.setItem("listaXML", JSON.stringify(lista));
   }
 }
 
@@ -250,9 +253,16 @@ function buscar(input) {
 
   if (input.value !== '') {
 
-    lista= localStorage.getItem("listaXML");
-    console.log(lista);
+
+    let element = document.getElementById("aquiLibros");
+
+    element.innerHTML = '';
+
+    let listaString = localStorage.getItem("listaXML");
+    console.log(listaString);
     console.log("Usted buscó: " + input.value);
+    let lista = JSON.parse(listaString);
+    console.log(lista);
 
 
     const options = {
@@ -263,7 +273,20 @@ function buscar(input) {
 
     const fuse = new Fuse(lista, options)
     console.log("Resultados de la búsqueda: ")
-    console.log(fuse.search(input.value));
+    let result = fuse.search(input.value);
+
+    console.log(result);
+
+    for (let i = 0; i < result.length; i++) {
+      let dic = result[i]["item"];
+      let autorLibroDic = dic["autorLibro"];
+      let añoPublicacionDic = dic["añoPublicacion"];
+      let nombreLibroDic = dic["nombreLibro"];
+      let imagenDic = dic["imagenURL"];
+      cargarLibro(imagenDic, autorLibroDic, añoPublicacionDic, nombreLibroDic)
+
+    }
+
 
   }
 
